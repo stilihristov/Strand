@@ -46,4 +46,4 @@ Life emerges at night. When temperatures drop, the Lightcores—which channel su
 * **Python (RhinoScriptSyntax)** (Scripting Logic)
 
 ---
-*Project by [Your Name]*
+*Project by Stiliyan Hristov*
