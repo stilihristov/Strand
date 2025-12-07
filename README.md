@@ -2,7 +2,7 @@
 
 **An algorithmic approach to subterranean urbanism in a desertified Northern Italy.**
 
-![Sub-Terra Settlement Axonometric](images/settlement_axo.jpg)
+![Sub-Terra Settlement Axonometric](images/settlement_axo.jpeg)
 
 ## 🌍 The Project
 **Location:** Pavia, Po Valley, Italy  
@@ -30,15 +30,15 @@ The core of this repository is a Python script for Rhino/Grasshopper that automa
 
 ### The Settlement System
 The project operates as a closed-loop metabolic system. The isometric view below shows the relationship between the subterranean dwelling and the surface infrastructure.
-![Sub-Terra Axonometric](images/settlement_axo.jpg)
+![Sub-Terra Axonometric](images/settlement_axo.jpeg)
 
 ### Surface Conditions (Day)
 The surface is harsh and arid. The steel-clad Solar Chimneys are the only visible sign of the life teeming below, acting as thermal engines to drive ventilation.
-![Surface Day View](images/outside_day.jpg)
+![Surface Day View](images/outside_day.jpeg)
 
 ### Surface Conditions (Night)
 Life emerges at night. When temperatures drop, the Lightcores—which channel sunlight down during the day—become lanterns, illuminating the communal spaces above ground.
-![Surface Night View](images/outside_night.jpg)
+![Surface Night View](images/outside_night.jpeg)
 
 ## 🛠️ Tech Stack
 * **Rhino 7 / 8** (Geometry Engine)
