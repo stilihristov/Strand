@@ -9,7 +9,7 @@
 **Year:** 2079  
 **Concept:** Entomo-Agriculture & Subterranean Living
 
-By 2079, the once-fertile Po Valley has succumbed to hyper-aridity, turning the region into a steppe[cite: 26, 40]. "Sub-Terra" proposes a survivalist evolution of the region's historical silk industry. [cite_start]Instead of farming silkworms for luxury, the settlement farms resilient insects (crickets, mealworms) for protein.
+By 2079, the once-fertile Po Valley has succumbed to hyper-aridity, turning the region into a steppe. "Sub-Terra" proposes a survivalist evolution of the region's historical silk industry. Instead of farming silkworms for luxury, the settlement farms resilient insects (crickets, mealworms) for protein.
 
 To survive surface temperatures reaching 50°C, the architecture colonizes the subsurface.Living quarters are buried 3 meters deep, utilizing the earth's thermal mass to maintain a stable 18°C, while "Solar Chimneys" and "Lightcores" pierce the crust to provide passive ventilation and natural light.
 
