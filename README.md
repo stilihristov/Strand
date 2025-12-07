@@ -1,6 +1,8 @@
 # Strand 
 
 **An algorithmic approach to subterranean urbanism in a desertified Northern Italy.**
+![Concept](images/Header.jpeg)
+
 
 ## 🌍 The Project
 **Location:** Pavia, Po Valley, Italy  
