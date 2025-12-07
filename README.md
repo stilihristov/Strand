@@ -2,8 +2,6 @@
 
 **An algorithmic approach to subterranean urbanism in a desertified Northern Italy.**
 
-![Sub-Terra Settlement Axonometric](images/settlement_axo.jpeg)
-
 ## 🌍 The Project
 **Location:** Pavia, Po Valley, Italy  
 **Year:** 2079  
