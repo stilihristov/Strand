@@ -1,6 +1,7 @@
 # Strand 
 
 **An algorithmic approach to subterranean urbanism in a desertified Northern Italy.**
+
 ![Concept](images/Header.jpg)
 
 
