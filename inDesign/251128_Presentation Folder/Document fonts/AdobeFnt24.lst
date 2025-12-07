@@ -1,0 +1,290 @@
+%!Adobe-FontList 1.24
+%Locale:0x409
+
+%BeginFont
+Handler:DirectoryHandler
+FontType:TrueType
+FontName:CormorantGaramond-Light
+FamilyName:Cormorant Garamond
+StyleName:Light
+FullName:Cormorant Garamond Light
+MenuName:Cormorant Garamond Light
+FamilyPrefix:CormorantGaramond
+StyleBits:0
+WritingScript:Roman
+OutlineFileName:C:\Users\Admin\Desktop\PoliMi\Ark\FinalPrep\Strand\inDesign\251128_Presentation Folder\Document fonts\CormorantGaramond-VariableFont_wght.ttf
+DataFormat:sfntData
+hasSVG:no
+hasCOLR:no
+VariableFontType:TrueTypeVariableFont
+FileLength:1023468
+FileModTime:1759498819
+WeightClass:300
+WidthClass:5
+AngleClass:0
+NameArray:0,Win,1,Cormorant Garamond Light
+NameArray:0,Win,16,Cormorant Garamond
+%EndFont
+
+%BeginFont
+Handler:DirectoryHandler
+FontType:TrueType
+FontName:Raleway-Bold
+FamilyName:Raleway
+StyleName:Bold
+FullName:Raleway Bold
+MenuName:Raleway
+StyleBits:2
+WritingScript:Roman
+OutlineFileName:C:\Users\Admin\Desktop\PoliMi\Ark\FinalPrep\Strand\inDesign\251128_Presentation Folder\Document fonts\Raleway-Bold.ttf
+DataFormat:sfntData
+hasSVG:no
+hasCOLR:no
+VariableFontType:NonVariableFont
+FileLength:128248
+FileModTime:1760437080
+WeightClass:700
+WidthClass:5
+AngleClass:0
+NameArray:0,Mac,18,Raleway Bold
+NameArray:0,Mac,4,Raleway Bold
+NameArray:0,Win,1,Raleway
+%EndFont
+
+%BeginFont
+Handler:DirectoryHandler
+FontType:TrueType
+FontName:Raleway-ExtraBold
+FamilyName:Raleway
+StyleName:ExtraBold
+FullName:Raleway ExtraBold
+MenuName:Raleway
+StyleBits:0
+WritingScript:Roman
+OutlineFileName:C:\Users\Admin\Desktop\PoliMi\Ark\FinalPrep\Strand\inDesign\251128_Presentation Folder\Document fonts\Raleway-ExtraBold.ttf
+DataFormat:sfntData
+hasSVG:no
+hasCOLR:no
+VariableFontType:NonVariableFont
+FileLength:125136
+FileModTime:1760437080
+WeightClass:800
+WidthClass:5
+AngleClass:0
+NameArray:0,Mac,18,Raleway ExtraBold
+NameArray:0,Mac,4,Raleway ExtraBold
+NameArray:0,Win,1,Raleway
+%EndFont
+
+%BeginFont
+Handler:DirectoryHandler
+FontType:TrueType
+FontName:Raleway-ExtraLight
+FamilyName:Raleway
+StyleName:ExtraLight
+FullName:Raleway ExtraLight
+MenuName:Raleway
+StyleBits:0
+WritingScript:Roman
+OutlineFileName:C:\Users\Admin\Desktop\PoliMi\Ark\FinalPrep\Strand\inDesign\251128_Presentation Folder\Document fonts\Raleway-ExtraLight.ttf
+DataFormat:sfntData
+hasSVG:no
+hasCOLR:no
+VariableFontType:NonVariableFont
+FileLength:122400
+FileModTime:1760437080
+WeightClass:200
+WidthClass:5
+AngleClass:0
+NameArray:0,Mac,18,Raleway ExtraLight
+NameArray:0,Mac,4,Raleway ExtraLight
+NameArray:0,Win,1,Raleway
+%EndFont
+
+%BeginFont
+Handler:DirectoryHandler
+FontType:TrueType
+FontName:Raleway-Heavy
+FamilyName:Raleway
+StyleName:Heavy
+FullName:Raleway Heavy
+MenuName:Raleway
+StyleBits:0
+WritingScript:Roman
+OutlineFileName:C:\Users\Admin\Desktop\PoliMi\Ark\FinalPrep\Strand\inDesign\251128_Presentation Folder\Document fonts\Raleway-Heavy.ttf
+DataFormat:sfntData
+hasSVG:no
+hasCOLR:no
+VariableFontType:NonVariableFont
+FileLength:129520
+FileModTime:1760437080
+WeightClass:900
+WidthClass:5
+AngleClass:0
+NameArray:0,Mac,18,Raleway Heavy
+NameArray:0,Mac,4,Raleway Heavy
+NameArray:0,Win,1,Raleway
+%EndFont
+
+%BeginFont
+Handler:DirectoryHandler
+FontType:TrueType
+FontName:Raleway-Medium
+FamilyName:Raleway
+StyleName:Medium
+FullName:Raleway Medium
+MenuName:Raleway
+StyleBits:0
+WritingScript:Roman
+OutlineFileName:C:\Users\Admin\Desktop\PoliMi\Ark\FinalPrep\Strand\inDesign\251128_Presentation Folder\Document fonts\Raleway-Medium.ttf
+DataFormat:sfntData
+hasSVG:no
+hasCOLR:no
+VariableFontType:NonVariableFont
+FileLength:129308
+FileModTime:1760437080
+WeightClass:500
+WidthClass:5
+AngleClass:0
+NameArray:0,Mac,18,Raleway Medium
+NameArray:0,Mac,4,Raleway Medium
+NameArray:0,Win,1,Raleway
+%EndFont
+
+%BeginFont
+Handler:DirectoryHandler
+FontType:TrueType
+FontName:Raleway-SemiBold
+FamilyName:Raleway
+StyleName:SemiBold
+FullName:Raleway SemiBold
+MenuName:Raleway
+StyleBits:0
+WritingScript:Roman
+OutlineFileName:C:\Users\Admin\Desktop\PoliMi\Ark\FinalPrep\Strand\inDesign\251128_Presentation Folder\Document fonts\Raleway-SemiBold.ttf
+DataFormat:sfntData
+hasSVG:no
+hasCOLR:no
+VariableFontType:NonVariableFont
+FileLength:130880
+FileModTime:1760437080
+WeightClass:600
+WidthClass:5
+AngleClass:0
+NameArray:0,Mac,18,Raleway SemiBold
+NameArray:0,Mac,4,Raleway SemiBold
+NameArray:0,Win,1,Raleway
+%EndFont
+
+%BeginFont
+Handler:DirectoryHandler
+FontType:Type1
+FontName:DINPro
+FamilyName:DIN Pro
+StyleName:Regular
+FullName:DIN Pro
+MenuName:DIN Pro Regular
+StyleBits:0
+WritingScript:Roman
+OutlineFileName:C:\Users\Admin\Desktop\PoliMi\Ark\FinalPrep\Strand\inDesign\251128_Presentation Folder\Document fonts\dinpro.otf
+DataFormat:sfntData
+UsesStandardEncoding:yes
+isCFF:yes
+hasSVG:no
+hasCOLR:no
+VariableFontType:NonVariableFont
+FileLength:139444
+FileModTime:1758660003
+WeightClass:400
+WidthClass:5
+AngleClass:0
+NameArray:0,Mac,18,DIN Pro
+NameArray:0,Mac,4,DIN Pro
+NameArray:0,Win,1,DIN Pro Regular
+NameArray:0,Win,16,DIN Pro
+%EndFont
+
+%BeginFont
+Handler:DirectoryHandler
+FontType:Type1
+FontName:DINPro-Bold
+FamilyName:DIN Pro
+StyleName:Bold
+FullName:DIN Pro Bold
+MenuName:DIN Pro Bold
+StyleBits:2
+WritingScript:Roman
+OutlineFileName:C:\Users\Admin\Desktop\PoliMi\Ark\FinalPrep\Strand\inDesign\251128_Presentation Folder\Document fonts\dinpro_bold.otf
+DataFormat:sfntData
+UsesStandardEncoding:yes
+isCFF:yes
+hasSVG:no
+hasCOLR:no
+VariableFontType:NonVariableFont
+FileLength:143848
+FileModTime:1758660004
+WeightClass:700
+WidthClass:5
+AngleClass:0
+NameArray:0,Mac,18,DIN Pro Bold
+NameArray:0,Mac,4,DIN Pro Bold
+NameArray:0,Win,1,DIN Pro Bold
+NameArray:0,Win,16,DIN Pro
+%EndFont
+
+%BeginFont
+Handler:DirectoryHandler
+FontType:Type1
+FontName:DINPro-Light
+FamilyName:DIN Pro
+StyleName:Light
+FullName:DIN Pro Light
+MenuName:DIN Pro Light
+StyleBits:0
+WritingScript:Roman
+OutlineFileName:C:\Users\Admin\Desktop\PoliMi\Ark\FinalPrep\Strand\inDesign\251128_Presentation Folder\Document fonts\dinpro_light.otf
+DataFormat:sfntData
+UsesStandardEncoding:yes
+isCFF:yes
+hasSVG:no
+hasCOLR:no
+VariableFontType:NonVariableFont
+FileLength:139220
+FileModTime:1758660003
+WeightClass:300
+WidthClass:5
+AngleClass:0
+NameArray:0,Mac,18,DIN Pro Light
+NameArray:0,Mac,4,DIN Pro Light
+NameArray:0,Win,1,DIN Pro Light
+NameArray:0,Win,16,DIN Pro
+%EndFont
+
+%BeginFont
+Handler:DirectoryHandler
+FontType:Type1
+FontName:DINPro-Medium
+FamilyName:DIN Pro
+StyleName:Medium
+FullName:DIN Pro Medium
+MenuName:DIN Pro Medium
+StyleBits:0
+WritingScript:Roman
+OutlineFileName:C:\Users\Admin\Desktop\PoliMi\Ark\FinalPrep\Strand\inDesign\251128_Presentation Folder\Document fonts\dinpro_medium.otf
+DataFormat:sfntData
+UsesStandardEncoding:yes
+isCFF:yes
+hasSVG:no
+hasCOLR:no
+VariableFontType:NonVariableFont
+FileLength:140816
+FileModTime:1758660004
+WeightClass:500
+WidthClass:5
+AngleClass:0
+NameArray:0,Mac,18,DIN Pro Medium
+NameArray:0,Mac,4,DIN Pro Medium
+NameArray:0,Win,1,DIN Pro Medium
+NameArray:0,Win,16,DIN Pro
+%EndFont
+
