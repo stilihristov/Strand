@@ -1,0 +1,434 @@
+import rhinoscriptsyntax as rs
+import Rhino.Geometry as rg
+import math
+import random
+import System.Collections.Generic as scg
+
+# --- CONFIGURATION ---
+GRID_UNIT = 3.75
+HOLE_RATIO = 0.25
+DENSITY_LIMIT = 0.90
+
+# --- DRAINAGE CONFIGURATION ---
+DRAINAGE_WIDTH = 2.0
+TUNNEL_WIDTH_GRID = 1
+
+# --- LIGHTING CONFIGURATION ---
+LIGHT_DIAMETER = 0.5
+LIGHT_SPACING = 1.875
+
+# --- UNIT SETTINGS ---
+AREAS = {
+    'gather': (800, 1050),
+    'living': (300, 450),
+    'prod': (30, 200),
+    'cistern': (100, 320)
+}
+
+# --- CLUSTER SETTINGS ---
+LIVING_MIN = 3
+LIVING_MAX = 5
+PROD_MIN = 5
+PROD_MAX = 12  # Kept smaller to prevent "blobs"
+
+class Block:
+    def __init__(self, gx, gy, gw, gh, b_type, cluster_id, attach_side=None, parent=None):
+        self.gx = int(gx); self.gy = int(gy)
+        self.gw = int(gw); self.gh = int(gh)
+        self.type = b_type
+        self.cluster_id = cluster_id
+        self.attach_side = attach_side
+        self.parent = parent
+
+        self.min_x = self.gx; self.max_x = self.gx + self.gw
+        self.min_y = self.gy; self.max_y = self.gy + self.gh
+
+    def get_outer_crv(self):
+        x = self.gx * GRID_UNIT
+        y = self.gy * GRID_UNIT
+        w = self.gw * GRID_UNIT
+        h = self.gh * GRID_UNIT
+
+        if self.type == 'cistern':
+            center = rg.Point3d(x + w/2.0, y + h/2.0, 0)
+            radius = min(w, h) / 2.0
+            return rg.Circle(rg.Plane.WorldXY, center, radius).ToNurbsCurve()
+        elif self.type == 'tunnel':
+            return rg.Rectangle3d(rg.Plane.WorldXY, rg.Point3d(x,y,0), rg.Point3d(x+w,y+h,0)).ToNurbsCurve()
+        else:
+            return rg.Rectangle3d(rg.Plane.WorldXY, rg.Point3d(x,y,0), rg.Point3d(x+w,y+h,0)).ToNurbsCurve()
+
+class VoidBlock:
+    def __init__(self, curve):
+        self.curve = curve
+        self.type = 'void'
+        self.cluster_id = -1
+        bbox = curve.GetBoundingBox(True)
+        self.min_x = int(bbox.Min.X / GRID_UNIT)
+        self.min_y = int(bbox.Min.Y / GRID_UNIT)
+        self.max_x = int(math.ceil(bbox.Max.X / GRID_UNIT))
+        self.max_y = int(math.ceil(bbox.Max.Y / GRID_UNIT))
+
+    def get_outer_crv(self):
+        return self.curve
+
+def check_overlap(new_b, existing_blocks):
+    # Rule: Cisterns cannot touch other Cisterns
+    cistern_buffer = 0
+    if new_b.type == 'cistern':
+        cistern_buffer = 1
+
+    for e in existing_blocks:
+        current_buffer = 0
+        if new_b.type == 'cistern' and e.type == 'cistern':
+            current_buffer = cistern_buffer
+
+        if (new_b.max_x + current_buffer <= e.min_x or
+            new_b.min_x >= e.max_x + current_buffer or
+            new_b.max_y + current_buffer <= e.min_y or
+            new_b.min_y >= e.max_y + current_buffer):
+            continue
+        else:
+            return True
+
+    return False
+
+def get_grid_dims(u_type):
+    if u_type == 'tunnel': return 1, 1
+
+    target_area = random.uniform(*AREAS[u_type])
+
+    if u_type == 'cistern':
+        side_m = math.sqrt(target_area)
+        g_side = max(1, int(round(side_m / GRID_UNIT)))
+        return g_side, g_side
+
+    aspect = random.uniform(0.6, 1.5)
+    w_m = math.sqrt(target_area * aspect); h_m = target_area / w_m
+    gw = max(1, int(round(w_m / GRID_UNIT))); gh = max(1, int(round(h_m / GRID_UNIT)))
+    if random.random() > 0.5: gw, gh = gh, gw
+    return gw, gh
+
+def get_anchors_standard(parent, child_w, child_h):
+    anchors = []
+    anchors.append((parent.max_x, parent.max_y - child_h, 1)) # Right
+    anchors.append((parent.max_x, parent.min_y, 1))
+    anchors.append((parent.min_x - child_w, parent.max_y - child_h, 3)) # Left
+    anchors.append((parent.min_x - child_w, parent.min_y, 3))
+    anchors.append((parent.min_x, parent.max_y, 2)) # Top
+    anchors.append((parent.max_x - child_w, parent.max_y, 2))
+    anchors.append((parent.min_x, parent.min_y - child_h, 0)) # Bottom
+    anchors.append((parent.max_x - child_w, parent.min_y - child_h, 0))
+    return anchors
+
+def get_anchors_with_tunnel(parent, hub_w, hub_h):
+    candidates = []
+    gap = TUNNEL_WIDTH_GRID
+
+    # Right
+    tx, ty, tw, th = parent.max_x, parent.max_y - hub_h, gap, hub_h
+    hx, hy = parent.max_x + gap, parent.max_y - hub_h
+    candidates.append( ((tx, ty, tw, th), (hx, hy)) )
+    tx, ty, tw, th = parent.max_x, parent.min_y, gap, hub_h
+    hx, hy = parent.max_x + gap, parent.min_y
+    candidates.append( ((tx, ty, tw, th), (hx, hy)) )
+
+    # Left
+    tx, ty, tw, th = parent.min_x - gap, parent.max_y - hub_h, gap, hub_h
+    hx, hy = parent.min_x - gap - hub_w, parent.max_y - hub_h
+    candidates.append( ((tx, ty, tw, th), (hx, hy)) )
+    tx, ty, tw, th = parent.min_x - gap, parent.min_y, gap, hub_h
+    hx, hy = parent.min_x - gap - hub_w, parent.min_y
+    candidates.append( ((tx, ty, tw, th), (hx, hy)) )
+
+    # Top
+    tx, ty, tw, th = parent.min_x, parent.max_y, hub_w, gap
+    hx, hy = parent.min_x, parent.max_y + gap
+    candidates.append( ((tx, ty, tw, th), (hx, hy)) )
+    tx, ty, tw, th = parent.max_x - hub_w, parent.max_y, hub_w, gap
+    hx, hy = parent.max_x - hub_w, parent.max_y + gap
+    candidates.append( ((tx, ty, tw, th), (hx, hy)) )
+
+    # Bottom
+    tx, ty, tw, th = parent.min_x, parent.min_y - gap, hub_w, gap
+    hx, hy = parent.min_x, parent.min_y - gap - hub_h
+    candidates.append( ((tx, ty, tw, th), (hx, hy)) )
+    tx, ty, tw, th = parent.max_x - hub_w, parent.min_y - gap, hub_w, gap
+    hx, hy = parent.max_x - hub_w, parent.min_y - gap - hub_h
+    candidates.append( ((tx, ty, tw, th), (hx, hy)) )
+
+    return candidates
+
+def generate_cluster_queue():
+    queue = []
+    # Order: Gather -> Cistern -> Living -> Prod
+    queue.append('gather')
+    queue.append('cistern')
+
+    num_living = random.randint(LIVING_MIN, LIVING_MAX)
+    for i in range(num_living): queue.append('living')
+
+    num_prod = random.randint(PROD_MIN, PROD_MAX)
+    for i in range(num_prod): queue.append('prod')
+
+    return queue
+
+def generate_light_matrix(block):
+    if block.type == 'cistern' or block.type == 'tunnel' or block.type == 'void': return []
+
+    lights = []
+    w_m = block.gw * GRID_UNIT; h_m = block.gh * GRID_UNIT
+    start_x = block.gx * GRID_UNIT; start_y = block.gy * GRID_UNIT
+    cols = int(w_m / LIGHT_SPACING); rows = int(h_m / LIGHT_SPACING)
+    margin_x = (w_m - (cols * LIGHT_SPACING)) / 2.0
+    margin_y = (h_m - (rows * LIGHT_SPACING)) / 2.0
+    radius = LIGHT_DIAMETER / 2.0
+    OFFSET_IDX = 1
+    if cols <= (OFFSET_IDX * 2) or rows <= (OFFSET_IDX * 2): return []
+
+    for i in range(cols):
+        for j in range(rows):
+            on_x_ring = (i == OFFSET_IDX or i == cols - 1 - OFFSET_IDX)
+            on_y_ring = (j == OFFSET_IDX or j == rows - 1 - OFFSET_IDX)
+            in_x_range = (i >= OFFSET_IDX and i <= cols - 1 - OFFSET_IDX)
+            in_y_range = (j >= OFFSET_IDX and j <= rows - 1 - OFFSET_IDX)
+            is_valid_perimeter = (on_x_ring and in_y_range) or (on_y_ring and in_x_range)
+
+            if is_valid_perimeter:
+                cx = start_x + margin_x + (i * LIGHT_SPACING) + (LIGHT_SPACING / 2.0)
+                cy = start_y + margin_y + (j * LIGHT_SPACING) + (LIGHT_SPACING / 2.0)
+                center = rg.Point3d(cx, cy, 0)
+                circle = rg.Circle(rg.Plane.WorldXY, center, radius).ToNurbsCurve()
+                lights.append(circle)
+    return lights
+
+def generate_unit_based_drainage(blocks):
+    individual_offsets = []
+    for b in blocks:
+        if b.type == 'void': continue
+        outer_crv = b.get_outer_crv()
+        offset_crvs = outer_crv.Offset(rg.Plane.WorldXY, DRAINAGE_WIDTH, 0.01, rg.CurveOffsetCornerStyle.Sharp)
+        if offset_crvs:
+            individual_offsets.extend(offset_crvs)
+
+    final_drainage = rg.Curve.CreateBooleanUnion(individual_offsets)
+    if not final_drainage: return individual_offsets
+    return final_drainage
+
+def main():
+    if not 'reset' in globals() or not reset: return [], [], [], [], [], [], [], [], [], [], []
+    if not 'boundary' in globals() or not boundary: return [], [], [], [], [], [], [], [], [], [], []
+
+    random.seed(int(seed))
+
+    boundary_brep = rs.coercebrep(boundary)
+    boundary_geo = None
+    void_blocks = []
+
+    if boundary_brep:
+        for loop in boundary_brep.Loops:
+            curve = loop.To3dCurve()
+            if loop.LoopType == rg.BrepLoopType.Outer:
+                boundary_geo = curve
+            elif loop.LoopType == rg.BrepLoopType.Inner:
+                void_blocks.append(VoidBlock(curve))
+    else:
+        boundary_geo = rs.coercecurve(boundary)
+
+    if not boundary_geo: return [], [], [], [], [], [], [], [], [], [], []
+
+    boundary_area = rg.AreaMassProperties.Compute(boundary_geo).Area
+    target_fill = boundary_area * DENSITY_LIMIT
+
+    placed_blocks = []
+    placed_blocks.extend(void_blocks)
+
+    # Track ALL tunnel blocks created to allow "Chain Reaction" connections
+    global_tunnel_tips = []
+
+    current_area_m = 0
+
+    build_queue = []
+    current_hub = None
+    current_cluster_id = 0
+
+    # Active set for THIS cluster
+    current_tunnel_spine = []
+    current_cluster_prods = []
+
+    bbox = boundary_geo.GetBoundingBox(True)
+    start_gx = int(bbox.Center.X / GRID_UNIT); start_gy = int(bbox.Center.Y / GRID_UNIT)
+    seed_w, seed_h = get_grid_dims('prod')
+
+    first_block = Block(start_gx, start_gy, seed_w, seed_h, 'prod', current_cluster_id, None, None)
+
+    seed_crv = first_block.get_outer_crv()
+
+    if (boundary_geo.Contains(seed_crv.GetBoundingBox(True).Center, rg.Plane.WorldXY, 0.1) == rg.PointContainment.Inside
+        and not check_overlap(first_block, placed_blocks)):
+        placed_blocks.append(first_block)
+        current_area_m += (seed_w * GRID_UNIT * seed_h * GRID_UNIT)
+        current_cluster_prods.append(first_block)
+    else:
+        return [], [], [], [], [], [], [], [], [], [], []
+
+    fails = 0
+
+    while current_area_m < target_fill and fails < 300:
+        if len(build_queue) == 0:
+            build_queue = generate_cluster_queue()
+            current_hub = None
+            current_tunnel_spine = []
+            current_cluster_prods = []
+            current_cluster_id += 1
+
+        u_type = build_queue[0]
+        gw, gh = get_grid_dims(u_type)
+
+        parent_candidates = []
+        valid_blocks = [b for b in placed_blocks if b.type != 'void']
+
+        # --- SELECTION LOGIC ---
+
+        if u_type == 'gather':
+            # --- CONTINUITY RULE ---
+            # To ensure connections, the new Hub MUST start from an existing Tunnel Tip
+            # If we have tunnel tips, prioritize them exclusively.
+            if len(global_tunnel_tips) > 0:
+                # We sort them to prefer the ones added recently (growth front)
+                # or randomly to allow branching. Let's try random first.
+                parent_candidates = list(global_tunnel_tips)
+                # If we fail to attach to a tunnel, we might fall back to anything,
+                # but that breaks continuity. Let's strictly prefer tunnels first.
+            else:
+                parent_candidates = valid_blocks # Fallback for first run
+
+        elif u_type == 'living':
+            if current_hub: parent_candidates = [current_hub]
+            else: parent_candidates = valid_blocks
+
+        elif u_type == 'prod':
+            # Priority: Current Tunnel > Current Prods > Hub
+            if len(current_tunnel_spine) > 0:
+                parent_candidates = list(current_tunnel_spine)
+                if len(current_cluster_prods) > 0:
+                    parent_candidates.extend(current_cluster_prods)
+            else:
+                if current_hub: parent_candidates = [current_hub]
+                parent_candidates.extend(current_cluster_prods)
+                if not parent_candidates: parent_candidates = valid_blocks
+
+        elif u_type == 'cistern':
+            parent_candidates = valid_blocks
+
+        placed = False
+
+        # --- PLACEMENT ATTEMPT ---
+        # 1. Try Specific High-Priority Candidates First (Tunnels)
+        if u_type == 'gather' and len(global_tunnel_tips) > 0:
+            # Shuffle so we don't always pick the same tip
+            random.shuffle(parent_candidates)
+
+            # Try connecting new Hub via a NEW tunnel segment
+            for parent in parent_candidates:
+                candidates = get_anchors_with_tunnel(parent, gw, gh)
+                random.shuffle(candidates)
+
+                for ((tx, ty, tw, th), (hx, hy)) in candidates:
+                    tunnel_cand = Block(tx, ty, tw, th, 'tunnel', current_cluster_id, None, parent)
+                    hub_cand = Block(hx, hy, gw, gh, u_type, current_cluster_id, None, tunnel_cand)
+
+                    if check_overlap(tunnel_cand, placed_blocks): continue
+                    if check_overlap(hub_cand, placed_blocks): continue
+
+                    hub_crv = hub_cand.get_outer_crv()
+                    if boundary_geo.Contains(hub_crv.GetBoundingBox(True).Center, rg.Plane.WorldXY, 0.1) == rg.PointContainment.Outside: continue
+
+                    placed_blocks.append(tunnel_cand)
+                    placed_blocks.append(hub_cand)
+
+                    # Track Global and Local lists
+                    global_tunnel_tips.append(tunnel_cand)
+                    current_tunnel_spine.append(tunnel_cand)
+
+                    current_hub = hub_cand
+                    current_area_m += (gw * GRID_UNIT * gh * GRID_UNIT)
+                    placed = True
+                    build_queue.pop(0)
+                    break
+                if placed: break
+
+        # 2. General Fallback (For Living, Prod, Cistern, or failed Gather)
+        if not placed:
+            random.shuffle(parent_candidates)
+            parents_to_try = parent_candidates[:30] # Limit search
+
+            for parent in parents_to_try:
+                anchors = get_anchors_standard(parent, gw, gh)
+                random.shuffle(anchors)
+                for (nx, ny, side_idx) in anchors:
+                    candidate = Block(nx, ny, gw, gh, u_type, current_cluster_id, side_idx, parent)
+
+                    if check_overlap(candidate, placed_blocks): continue
+                    outer_crv = candidate.get_outer_crv()
+                    if boundary_geo.Contains(outer_crv.GetBoundingBox(True).Center, rg.Plane.WorldXY, 0.1) == rg.PointContainment.Outside: continue
+
+                    placed_blocks.append(candidate)
+
+                    if u_type == 'gather': current_hub = candidate
+                    if u_type == 'prod': current_cluster_prods.append(candidate)
+
+                    current_area_m += (gw * GRID_UNIT * gh * GRID_UNIT)
+                    placed = True
+                    build_queue.pop(0)
+                    break
+                if placed: break
+
+        if placed:
+            fails = 0
+        else:
+            fails += 1
+            if fails % 50 == 0:
+                if len(build_queue) > 0:
+                    build_queue.pop(0)
+                    fails = 0
+
+    # --- OUTPUT ---
+    o_liv, o_prod, o_gath, o_cist, o_tunnels = [], [], [], [], []
+    h_liv, h_prod, h_gath = [], [], []
+    o_walls = []
+    all_lights = []
+
+    for b in placed_blocks:
+        if b.type == 'void': continue
+
+        outer = b.get_outer_crv()
+
+        if b.type == 'tunnel':
+            o_tunnels.append(outer)
+            continue
+
+        o_walls.append(outer)
+
+        if b.type != 'cistern':
+            center = outer.GetBoundingBox(True).Center
+            transform = rg.Transform.Scale(center, HOLE_RATIO)
+            hole = outer.Duplicate(); hole.Transform(transform)
+            if b.type == 'living': h_liv.append(hole)
+            elif b.type == 'prod': h_prod.append(hole)
+            elif b.type == 'gather': h_gath.append(hole)
+
+        block_lights = generate_light_matrix(b)
+        all_lights.extend(block_lights)
+
+        if b.type == 'living': o_liv.append(outer)
+        elif b.type == 'prod': o_prod.append(outer)
+        elif b.type == 'gather': o_gath.append(outer)
+        elif b.type == 'cistern': o_cist.append(outer)
+
+    final_drainage = generate_unit_based_drainage(placed_blocks)
+
+    return o_liv, o_prod, o_gath, o_cist, o_tunnels, h_liv, h_prod, h_gath, all_lights, final_drainage
+
+# Execute
+living, prod, gather, cisterns, tunnels, living_holes, prod_holes, gather_holes, lights, drainage = main()
